@@ -34,7 +34,7 @@ function ProductTable({products, inStockOnly, filterText}){
 
     products.forEach(product => {
 
-        if(inStockOnly && !product.stocked){
+        if((inStockOnly && !product.stocked) || (product.name.indexOf(filterText) === -1)){
             return
         }
 
@@ -96,15 +96,15 @@ class FilterableProductTable extends React.Component{
             filterText: '',
             inStockOnly: false
         }
-        this.handleInStockOnly = this.handleInStockOnly.bind(this)
+        this.handleInStockChange = this.handleInStockChange.bind(this)
         this.handleFilterTextChange = this.handleFilterTextChange.bind(this)
     }
 
-    handleFilterTextChange({filterText}){
+    handleFilterTextChange(filterText){
         this.setState({filterText})
     }
 
-    handleInStockOnly({inStockOnly}){
+    handleInStockChange(inStockOnly){
         this.setState({inStockOnly})
     }
 
@@ -115,7 +115,7 @@ class FilterableProductTable extends React.Component{
             filterText={this.state.filterText} 
             inStockOnly={this.state.inStockOnly} 
             onFilterTextChange={this.handleFilterTextChange}
-            onStockChange={this.handleInStockOnly}
+            onStockChange={this.handleInStockChange}
             />
             <ProductTable 
             products={products} 
