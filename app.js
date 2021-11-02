@@ -145,7 +145,8 @@ class Home2 extends React.Component{
             nom: "",
             description:"",
             option:"",
-            option2: ""
+            option2: "",
+            checked:true
         }
         this.handleChange = this.handleChange.bind(this)
     }
@@ -155,7 +156,8 @@ class Home2 extends React.Component{
         e.target.name == 'nom' ? this.setState({nom:e.target.value}) : 
         e.target.name == 'option' ? this.setState({option:e.target.value}) : 
         e.target.name == 'option2' ? this.setState({option2:Array.from(e.target.selectedOptions).map(o => o.value)}) : 
-        console.log("False")
+        e.target.name == 'checked' ? this.setState({checked:e.target.checked}) : 
+        null
     }
 
     render () {
@@ -187,12 +189,120 @@ class Home2 extends React.Component{
                     <option value="option3">Option 3</option>
                 </select>
             </div>
+
+            <div>
+            <label htmlFor="checked">Checkbox</label><br />
+                <input type="checkbox" name="checked" checked={this.state.checked} onChange={this.handleChange} /> Option 1
+
+                {this.state.checked ? <div>Un message à afficher si la checkbox est cocher</div> : null}
+            </div>
+
         </React.Fragment>
     }
 }
 
 
+/* TP - Convertisseur Celsius - Fahrenheit */
 
+const scaleNames = {
+    c:"Celcius",
+    f:"Fahrenhit"
+}
+
+class TemperatureInput extends React.Component{
+    
+    constructor(props){
+        super(props)
+        //this.state = {temperature:''}
+        this.handleChange = this.handleChange.bind(this)
+    }
+
+    handleChange(e){
+        //this.setState({temperature: e.target.value})
+        this.props.onChangeTemperature(e.target.value)
+    }
+
+    render(){
+        const {temperature} = this.props
+        const name = 'scale' + this.props.scale
+        const scaleName = scaleNames[this.props.scale]
+        return <React.Fragment>
+            <div className="form-group">
+                <label htmlFor={name}>Température ({scaleName})</label>
+                <input type="text" id={name} onChange={this.handleChange} value={temperature} />
+            </div>
+        </React.Fragment>
+    }
+}
+
+function BoilingVerdict({celcius}){
+    if(celcius >= 100){
+        return <div className="alert alert-success">L'eau bout</div>
+    }else{
+        return <div className="alert alert-danger">L'eau ne bout pas</div>
+    }
+}
+
+/**
+ * 
+ *  
+ * FORMULE CONVERSION FAHRENHIT EN CELCIUS  
+ * T(°C) = (T(°F) - 32) × 5/9
+ * T(°F) = T(°C) x 9/5 + 32 
+ */
+function toCelcius(fahrenhit){
+    return (fahrenhit - 32) * 5/9
+}
+
+function toFahrenhit(celcius){
+    return celcius * 9/5 + 32
+}
+
+function tryConvert(temperature, convert){
+    const value = parseFloat(temperature)
+    if(Number.isNaN(value)){return '';}
+    return (Math.round(convert(value) * 100) / 100).toString()
+}
+
+class Tptemp extends React.Component{
+
+    constructor(props){
+        super(props)
+        this.state = {
+            temperature:20,
+            scale: 'c'
+        }
+        //this.handleChange = this.handleChange.bind(this)
+        this.handleCelciusChange = this.handleCelciusChange.bind(this)
+        this.handleFahrenheitChange = this.handleFahrenheitChange.bind(this)
+    }
+
+
+    handleCelciusChange(temperature){
+        this.setState({
+            scale:'c',
+            temperature
+        })
+    }
+
+    handleFahrenheitChange(temperature){
+        this.setState({
+            scale:'f',
+            temperature
+        })
+    }
+
+    render() {
+        const {temperature, scale} = this.state
+        const celcius = scale === 'c' ? temperature : tryConvert(temperature,toCelcius)
+        const fahrenhit = scale === 'f' ? temperature : tryConvert(temperature,toFahrenhit)
+        return <React.Fragment>
+            <TemperatureInput scale="c" temperature={celcius} onChangeTemperature={this.handleCelciusChange} />
+            <TemperatureInput scale="f" temperature={fahrenhit} onChangeTemperature={this.handleFahrenheitChange} />
+            <BoilingVerdict celcius={parseFloat(celcius)}></BoilingVerdict>
+        </React.Fragment>
+    }
+}
 
 function Home () {
     return <div>
@@ -202,4 +312,4 @@ function Home () {
 
 //ReactDOM.render(<Welcome name="JonathWelcomean">Bonjour tout le monde</Welcome>, document.querySelector('#app'))
 
-ReactDOM.render(<Home2 />, document.querySelector('#app'))
+ReactDOM.render(<Tptemp />, document.querySelector('#app'))
