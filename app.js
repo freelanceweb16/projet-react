@@ -13,13 +13,17 @@
     {category: "Electronics", price: "$199.99", stocked: true, name: "Nexus 7"}
 ];
 
-function ProductRow({product}){
+function ProductRowComponent({product}){
     const name = product.stocked ? product.name : <span className="text-danger">{product.name}</span>
+    //wait(500)
+    console.log('render');
     return <tr>
         <td>{name}</td>
         <td>{product.price}</td>
     </tr>
 }
+
+const ProductRow = React.memo(ProductRowComponent)
 
 function ProductCategoryRow({category}){
     return <tr>
@@ -58,7 +62,7 @@ function ProductTable({products, inStockOnly, filterText}){
     </table>
 }
 
-class SearchBar extends React.Component{
+class SearchBar extends React.PureComponent{
 
     constructor(props){
         super(props)
@@ -88,7 +92,7 @@ class SearchBar extends React.Component{
     }
 }
 
-class FilterableProductTable extends React.Component{
+class FilterableProductTable extends React.PureComponent{
 
     constructor(props) {
         super(props)
@@ -109,6 +113,7 @@ class FilterableProductTable extends React.Component{
     }
 
     render(){
+        console.log('render')
         const {products} = this.props
         return <React.Fragment>
             <SearchBar 
@@ -126,3 +131,10 @@ class FilterableProductTable extends React.Component{
 }
 
 ReactDOM.render(<FilterableProductTable products={Products}></FilterableProductTable>, document.getElementById('app'))
+
+const Products2 = [...Products, {category: "Electronics", price: "$199.99", stocked: true, name: "Nexus 8"}];
+
+
+window.setTimeout(function(){
+    ReactDOM.render(<FilterableProductTable products={Products2}></FilterableProductTable>, document.getElementById('app'));
+}, 2000)
